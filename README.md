@@ -4,7 +4,7 @@ A little exercise to build a web application following an agile development proc
 
 ## Product vision statement
 
-See instructions. Delete this line and place the Product Vision Statement here.
+Our webapp will help users manage their to-do lists and keep track of their daily activities in a streamlined, user-friendly format.
 
 ## User stories
 
