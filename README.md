@@ -12,7 +12,12 @@ See instructions. Delete this line and place a link to the user stories here.
 
 ## Steps necessary to run the software
 
-See instructions. Delete this line and place instructions to download, configure, and run the software here.
+1. git clone <your-repo-url>
+2. pip install -r requirements.txt
+3. python app.py
+
+Should work through: http://localhost:5000
+
 
 ## Task boards
 
