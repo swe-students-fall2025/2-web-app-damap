@@ -28,10 +28,15 @@
     <!-- Navigation -->
     {% if current_user.is_authenticated %}
     <nav class="nav">
-        <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
-        <a href="{{ url_for('tasks') }}" class="{% if request.endpoint == 'tasks' %}active{% endif %}">All Tasks</a>
-        <a href="{{ url_for('new_task') }}" class="{% if request.endpoint == 'new_task' %}active{% endif %}">New Task</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
+        <div style="display: flex; align-items: center;">
+            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+            <a href="{{ url_for('tasks') }}" class="{% if request.endpoint == 'tasks' %}active{% endif %}">All Tasks</a>
+            <a href="{{ url_for('new_task') }}" class="{% if request.endpoint == 'new_task' %}active{% endif %}">New Task</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+        <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+            <span id="dark-mode-text">Dark Mode</span>
+        </button>
     </nav>
     {% endif %}
 
@@ -69,6 +74,34 @@
                 location.reload();
             });
         }
+
+        // Dark mode functionality
+        function toggleDarkMode() {
+            const body = document.body;
+            const darkModeText = document.getElementById('dark-mode-text');
+            
+            if (body.classList.contains('dark-mode')) {
+                body.classList.remove('dark-mode');
+                darkModeText.textContent = 'Dark Mode';
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                body.classList.add('dark-mode');
+                darkModeText.textContent = 'Light Mode';
+                localStorage.setItem('darkMode', 'true');
+            }
+        }
+
+        // Load dark mode preference on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const darkMode = localStorage.getItem('darkMode');
+            const body = document.body;
+            const darkModeText = document.getElementById('dark-mode-text');
+            
+            if (darkMode === 'true') {
+                body.classList.add('dark-mode');
+                darkModeText.textContent = 'Light Mode';
+            }
+        });
     </script>
 </body>
 </html>

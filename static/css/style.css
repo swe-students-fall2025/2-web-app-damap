@@ -12,6 +12,126 @@ body {
     color: #333;
     background-color: #f8f9fa;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e9ecef;
+}
+
+body.dark-mode .header {
+    background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+}
+
+body.dark-mode .nav {
+    background: #2d3748;
+    border-bottom-color: #4a5568;
+}
+
+body.dark-mode .nav a {
+    color: #e9ecef;
+}
+
+body.dark-mode .nav a:hover, 
+body.dark-mode .nav a.active {
+    background: #4a5568;
+    color: white;
+}
+
+body.dark-mode .card {
+    background: #2d3748;
+    border-color: #4a5568;
+    color: #e9ecef;
+}
+
+body.dark-mode .task-title {
+    color: #e9ecef;
+}
+
+body.dark-mode .task-description {
+    color: #a0aec0;
+}
+
+body.dark-mode .form-label {
+    color: #e9ecef;
+}
+
+body.dark-mode .form-control {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e9ecef;
+}
+
+body.dark-mode .form-control:focus {
+    border-color: #667eea;
+    background: #4a5568;
+}
+
+body.dark-mode .stat-card {
+    background: #2d3748;
+    color: #e9ecef;
+}
+
+body.dark-mode .stat-label {
+    color: #a0aec0;
+}
+
+body.dark-mode .filters {
+    background: #2d3748;
+    color: #e9ecef;
+}
+
+body.dark-mode .filter-select {
+    background: #4a5568;
+    border-color: #718096;
+    color: #e9ecef;
+}
+
+body.dark-mode .flash-message {
+    background: #2d3748;
+    color: #e9ecef;
+    border-left-color: #28a745;
+}
+
+body.dark-mode .empty-state {
+    color: #a0aec0;
+}
+
+body.dark-mode .empty-state h3 {
+    color: #e9ecef;
+}
+
+body.dark-mode .task-tag {
+    background: #4a5568;
+    color: #e9ecef;
+}
+
+/* Dark mode toggle button */
+.dark-mode-toggle {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+}
+
+.dark-mode-toggle:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+body.dark-mode .dark-mode-toggle {
+    background: #4a5568;
+}
+
+body.dark-mode .dark-mode-toggle:hover {
+    background: #718096;
 }
 
 /* Header */
