@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Task Manager{% endblock %}
+
+{% block header_title %}🔐 Login{% endblock %}
+{% block header_subtitle %}Welcome back!{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 400px; margin: 2rem auto;">
+    <h2 style="margin-bottom: 1.5rem; text-align: center; color: #2c3e50;">Sign In</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="username" class="form-label">Username</label>
+            <input type="text" id="username" name="username" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        
+        <div style="text-align: center; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                Login
+            </button>
+            <p style="color: #6c757d; font-size: 0.9rem;">
+                Don't have an account? 
+                <a href="{{ url_for('register') }}" style="color: #667eea; text-decoration: none; font-weight: 500;">
+                    Create one here
+                </a>
+            </p>
+        </div>
+    </form>
+</div>
+{% endblock %}

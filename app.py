@@ -1,0 +1,191 @@
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from pymongo import MongoClient
+from bson import ObjectId
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
+import bcrypt
+
+# Load environment variables
+load_dotenv()
+
+app = Flask(__name__)
+app.secret_key = os.getenv('SECRET_KEY', 'your-secret-key-here')
+
+# Configure login manager
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
+login_manager.login_message = 'Please log in to access this page.'
+
+# MongoDB connection
+MONGO_URI = os.getenv('MONGO_URI', 'mongodb://localhost:27017/')
+client = MongoClient(MONGO_URI)
+db = client.task_manager
+
+# User class for Flask-Login
+class User(UserMixin):
+    def __init__(self, user_id, username, email):
+        self.id = str(user_id)
+        self.username = username
+        self.email = email
+
+@login_manager.user_loader
+def load_user(user_id):
+    user_data = db.users.find_one({'_id': ObjectId(user_id)})
+    if user_data:
+        return User(user_data['_id'], user_data['username'], user_data['email'])
+    return None
+
+# Routes
+@app.route('/')
+def index():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+    return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        user_data = db.users.find_one({'username': username})
+        if user_data and bcrypt.checkpw(password.encode('utf-8'), user_data['password']):
+            user = User(user_data['_id'], user_data['username'], user_data['email'])
+            login_user(user)
+            return redirect(url_for('dashboard'))
+        else:
+            flash('Invalid username or password')
+    
+    return render_template('login.html')
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        
+        # Check if user already exists
+        if db.users.find_one({'username': username}) or db.users.find_one({'email': email}):
+            flash('Username or email already exists')
+            return render_template('register.html')
+        
+        # Hash password
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        
+        # Create user
+        user_id = db.users.insert_one({
+            'username': username,
+            'email': email,
+            'password': hashed_password,
+            'created_at': datetime.utcnow()
+        }).inserted_id
+        
+        user = User(user_id, username, email)
+        login_user(user)
+        return redirect(url_for('dashboard'))
+    
+    return render_template('register.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('index'))
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
+
+@app.route('/tasks')
+@login_required
+def tasks():
+    # Get user's tasks
+    tasks = list(db.tasks.find({'user_id': ObjectId(current_user.id)}).sort('created_at', -1))
+    
+    return render_template('tasks.html', tasks=tasks)
+
+@app.route('/tasks/new', methods=['GET', 'POST'])
+@login_required
+def new_task():
+    if request.method == 'POST':
+        title = request.form['title']
+        
+        task_data = {
+            'user_id': ObjectId(current_user.id),
+            'title': title,
+            'completed': False,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        
+        db.tasks.insert_one(task_data)
+        flash('Task created successfully!')
+        return redirect(url_for('tasks'))
+    
+    return render_template('new_task.html')
+
+@app.route('/tasks/<task_id>')
+@login_required
+def view_task(task_id):
+    task = db.tasks.find_one({'_id': ObjectId(task_id), 'user_id': ObjectId(current_user.id)})
+    if not task:
+        flash('Task not found')
+        return redirect(url_for('tasks'))
+    
+    return render_template('view_task.html', task=task)
+
+@app.route('/tasks/<task_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_task(task_id):
+    task = db.tasks.find_one({'_id': ObjectId(task_id), 'user_id': ObjectId(current_user.id)})
+    if not task:
+        flash('Task not found')
+        return redirect(url_for('tasks'))
+    
+    if request.method == 'POST':
+        title = request.form['title']
+        completed = 'completed' in request.form
+        
+        update_data = {
+            'title': title,
+            'completed': completed,
+            'updated_at': datetime.utcnow()
+        }
+        
+        db.tasks.update_one({'_id': ObjectId(task_id)}, {'$set': update_data})
+        flash('Task updated successfully!')
+        return redirect(url_for('view_task', task_id=task_id))
+    
+    return render_template('edit_task.html', task=task)
+
+@app.route('/tasks/<task_id>/delete', methods=['POST'])
+@login_required
+def delete_task(task_id):
+    result = db.tasks.delete_one({'_id': ObjectId(task_id), 'user_id': ObjectId(current_user.id)})
+    if result.deleted_count > 0:
+        flash('Task deleted successfully!')
+    else:
+        flash('Task not found')
+    
+    return redirect(url_for('tasks'))
+
+@app.route('/tasks/<task_id>/toggle', methods=['POST'])
+@login_required
+def toggle_task(task_id):
+    task = db.tasks.find_one({'_id': ObjectId(task_id), 'user_id': ObjectId(current_user.id)})
+    if task:
+        new_status = not task.get('completed', False)
+        db.tasks.update_one(
+            {'_id': ObjectId(task_id)},
+            {'$set': {'completed': new_status, 'updated_at': datetime.utcnow()}}
+        )
+    
+    return redirect(url_for('tasks'))
+
+if __name__ == '__main__':
+    app.run(debug=True)

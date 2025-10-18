@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}New Task - Task Manager{% endblock %}
+
+{% block header_title %}New Task{% endblock %}
+{% block header_subtitle %}Create a new task{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">Create New Task</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="title" class="form-label">Task Title *</label>
+            <input type="text" id="title" name="title" class="form-control" required placeholder="Enter task title">
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                Create Task
+            </button>
+            <a href="{{ url_for('tasks') }}" class="btn btn-secondary" style="flex: 1;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

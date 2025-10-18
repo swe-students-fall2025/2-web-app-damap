@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}All Tasks - Task Manager{% endblock %}
+
+{% block header_title %}All Tasks{% endblock %}
+{% block header_subtitle %}Manage your tasks{% endblock %}
+
+{% block content %}
+<!-- Tasks List -->
+{% if tasks %}
+    {% for task in tasks %}
+    <div class="task-card {% if task.completed %}completed{% endif %}">
+        <div class="task-title">
+            {% if task.completed %}[Completed]{% endif %}
+            {{ task.title }}
+        </div>
+        
+        <div class="task-actions">
+            <a href="{{ url_for('view_task', task_id=task._id) }}" class="btn btn-outline">
+                View
+            </a>
+            <a href="{{ url_for('edit_task', task_id=task._id) }}" class="btn btn-secondary">
+                Edit
+            </a>
+            {% if not task.completed %}
+            <button onclick="toggleTask('{{ task._id }}')" class="btn btn-success">
+                Mark Complete
+            </button>
+            {% endif %}
+            <form method="POST" action="{{ url_for('delete_task', task_id=task._id) }}" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this task?')">
+                <button type="submit" class="btn btn-danger">
+                    Delete
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <h3>No tasks found</h3>
+        <p>Create your first task to get started</p>
+        <a href="{{ url_for('new_task') }}" class="btn btn-primary">
+            Create New Task
+        </a>
+    </div>
+{% endif %}
+
+<!-- Add Task Button -->
+<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+    <a href="{{ url_for('new_task') }}" class="btn btn-primary" style="border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);">
+        +
+    </a>
+</div>
+{% endblock %}

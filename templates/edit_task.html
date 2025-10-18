@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task - Task Manager{% endblock %}
+
+{% block header_title %}Edit Task{% endblock %}
+{% block header_subtitle %}Update your task{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2 style="margin-bottom: 1.5rem; color: #2c3e50;">Edit Task</h2>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="title" class="form-label">Task Title *</label>
+            <input type="text" id="title" name="title" class="form-control" value="{{ task.title }}" required>
+        </div>
+        
+        {% if task.completed %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="completed" checked>
+                <span>Mark as completed</span>
+            </label>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="completed">
+                <span>Mark as completed</span>
+            </label>
+        </div>
+        {% endif %}
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+            <button type="submit" class="btn btn-primary" style="flex: 1;">
+                Update Task
+            </button>
+            <a href="{{ url_for('view_task', task_id=task._id) }}" class="btn btn-secondary" style="flex: 1;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

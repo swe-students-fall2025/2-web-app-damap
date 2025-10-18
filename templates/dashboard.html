@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Task Manager{% endblock %}
+
+{% block header_title %}Dashboard{% endblock %}
+{% block header_subtitle %}Welcome back, {{ current_user.username }}!{% endblock %}
+
+{% block content %}
+<!-- Quick Actions -->
+<div class="card">
+    <h3 style="margin-bottom: 1rem; color: #2c3e50;">Quick Actions</h3>
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('new_task') }}" class="btn btn-primary">
+            New Task
+        </a>
+        <a href="{{ url_for('tasks') }}" class="btn btn-outline">
+            View All Tasks
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome - Task Manager{% endblock %}
+
+{% block header_title %}📝 Welcome to Task Manager{% endblock %}
+{% block header_subtitle %}Your personal productivity companion{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-bottom: 1rem; color: #2c3e50;">Get Started</h2>
+    <p style="margin-bottom: 2rem; color: #6c757d; line-height: 1.6;">
+        Task Manager helps you organize your life with powerful features like task tracking, 
+        due dates, tags, and productivity insights. Perfect for students, professionals, and 
+        anyone looking to boost their productivity.
+    </p>
+    
+    <div style="display: flex; flex-direction: column; gap: 1rem; max-width: 300px; margin: 0 auto;">
+        <a href="{{ url_for('login') }}" class="btn btn-primary" style="text-align: center;">
+            Login to Your Account
+        </a>
+        <a href="{{ url_for('register') }}" class="btn btn-outline" style="text-align: center;">
+            Create New Account
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 1rem; color: #2c3e50;">Features</h3>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📋</div>
+            <h4 style="margin-bottom: 0.5rem;">Task Management</h4>
+            <p style="font-size: 0.9rem; color: #6c757d;">Create, edit, and organize your tasks</p>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">🏷️</div>
+            <h4 style="margin-bottom: 0.5rem;">Tags & Categories</h4>
+            <p style="font-size: 0.9rem; color: #6c757d;">Organize tasks with custom tags</p>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+            <h4 style="margin-bottom: 0.5rem;">Analytics</h4>
+            <p style="font-size: 0.9rem; color: #6c757d;">Track your productivity progress</p>
+        </div>
+        <div style="text-align: center; padding: 1rem;">
+            <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+            <h4 style="margin-bottom: 0.5rem;">Mobile First</h4>
+            <p style="font-size: 0.9rem; color: #6c757d;">Optimized for mobile devices</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
