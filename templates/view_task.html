@@ -12,9 +12,20 @@
         {{ task.title }}
     </div>
     
-    <div class="task-meta" style="margin-bottom: 2rem;">
+    <div class="task-meta" style="margin-bottom: 2rem; display: flex; gap: 0.5rem;">
         <span class="task-tag" style="background: {% if task.completed %}#28a745{% else %}#6c757d{% endif %}; color: white;">
             {% if task.completed %}Completed{% else %}Pending{% endif %}
+        </span>
+        <span class="task-tag" style="background: 
+            {% if task.priority == 'high' %}#dc3545
+            {% elif task.priority == 'low' %}#28a745
+            {% else %}#ffc107{% endif %}; color: white;">
+            {% if task.priority == 'high' %}🔴 High Priority
+            {% elif task.priority == 'low' %}🟢 Low Priority
+            {% else %}🟡 Medium Priority{% endif %}
+        </span>
+        <span class="task-tag" style="background: #667eea; color: white;">
+            {% if task.category == 'work' %} Work{% elif task.category == 'personal' %} Personal{% elif task.category == 'school' %} School{% elif task.category == 'health' %} Health{% elif task.category == 'finance' %} Finance{% elif task.category == 'shopping' %} Shopping{% else %} General{% endif %}
         </span>
     </div>
     

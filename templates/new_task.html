@@ -15,6 +15,30 @@
             <input type="text" id="title" name="title" class="form-control" required placeholder="Enter task title">
         </div>
         
+        <div class="form-group">
+            <label for="priority" class="form-label">Priority</label>
+            <select id="priority" name="priority" class="form-control">
+                <option value="low">🟢 Low</option>
+                <option value="medium" selected>🟡 Medium</option>
+                <option value="high">🔴 High</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="category" class="form-label">Category</label>
+            <select id="category" name="category" class="form-control">
+                <option value="general"> General</option>
+                <option value="work"> Work</option>
+                <option value="personal"> Personal</option>
+                <option value="school"> School</option>
+                <option value="health"> Health</option>
+                <option value="finance"> Finance</option>
+                <option value="shopping"> Shopping</option>
+            </select>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
             <button type="submit" class="btn btn-primary" style="flex: 1;">
                 Create Task
