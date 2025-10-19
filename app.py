@@ -108,7 +108,8 @@ def tasks():
     filter_by = request.args.get('filter', 'all')  # all, completed, pending
     priority_filter = request.args.get('priority', 'all')  # all, high, medium, low
     category_filter = request.args.get('category', 'all')
-    sort_by = request.args.get('sort', 'newest')   # newest, oldest, alphabetical
+    tag_filter = request.args.get('tag', 'all')  # Filter tasks by tags - tag filter
+    sort_by = request.args.get('sort', 'newest')   # newest, oldest, alphabetical, due date
     
     # Build query based on filter
     query = {'user_id': ObjectId(current_user.id)}
@@ -133,19 +134,30 @@ def tasks():
             ]
         else:
             query['category'] = category_filter
+
+    # Filter tasks by tag - add tag filter
+    if tag_filter != 'all':
+        query['tags'] = tag_filter
     
     # Determine sort order
     if sort_by == 'oldest':
         sort_order = [('created_at', 1)]  # ascending
     elif sort_by == 'alphabetical':
         sort_order = [('title', 1)]  # A-Z
+    #Sort tasks by due date - sort by due date (nulls last), then by created_at
+    elif sort_by == 'due_date':
+        sort_order = [('due_date', 1), ('created_at', -1)]
     else:  # newest (default)
         sort_order = [('created_at', -1)]  # descending
     
     # Get filtered and sorted tasks
     tasks = list(db.tasks.find(query).sort(sort_order))
+
+    # Filter tasks by tag - Get all unique tags for filter dropdown
+    all_tags = db.tasks.distinct('tags', {'user_id': ObjectId(current_user.id)})
     
-    return render_template('tasks.html', tasks=tasks, filter_by=filter_by, sort_by=sort_by, priority_filter=priority_filter, category_filter=category_filter)
+    # Filter tasks by tag - Pass tag filter & all tags to template
+    return render_template('tasks.html', tasks=tasks, filter_by=filter_by, sort_by=sort_by, priority_filter=priority_filter, category_filter=category_filter, tag_filter=tag_filter, all_tags=all_tags)
 
 @app.route('/tasks/search')
 @login_required
@@ -172,11 +184,27 @@ def new_task():
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
 
+        # Assigning tags to tasks - Get tags from form (comma-separated)
+        tags_input = request.form.get('tags', '')
+        tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+
+        #Adding due dates to tasks - Get due date from form
+        due_date_str = request.form.get('due_date', '')
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('new_task.html')
+
         task_data = {
             'user_id': ObjectId(current_user.id),
             'title': title,
             'priority': priority,
             'category': category,
+            'tags': tags,  # Assigning tags to tasks - store tags as array
+            'due_date': due_date,  # Adding due dates to tasks - store due date
             'completed': False,
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
@@ -211,12 +239,28 @@ def edit_task(task_id):
         completed = 'completed' in request.form
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
-        
+
+        # Assigning tags to tasks - Get tags from form 
+        tags_input = request.form.get('tags', '')
+        tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+
+        # Adding due date to tasks - Get due date from form
+        due_date_str = request.form.get('due_date', '')
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('edit_task.html', task=task)
+
         update_data = {
             'title': title,
             'completed': completed,
             'priority': priority,
             'category': category,
+            'tags': tags, #Assigning tags to tasks - Update tags
+            'due_date': due_date,  # Adding due date to tasks - Update due date
             'updated_at': datetime.utcnow()
         }
         
