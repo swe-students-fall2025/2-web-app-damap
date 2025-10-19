@@ -60,6 +60,12 @@
             {% endif %}
         </p>
         {% endif %}
+
+        <!-- Display feedback -->
+         {% if task.feedback %}
+        <p><strong>Feedback:</strong></p>
+            {{ task.feedback }}
+         {% endif %}
     </div>
 
     <!--Display Notes/Comments Section -->
