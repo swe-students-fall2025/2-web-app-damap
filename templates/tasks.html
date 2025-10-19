@@ -6,13 +6,119 @@
 {% block header_subtitle %}Manage your tasks{% endblock %}
 
 {% block content %}
+<!-- Search Bar -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <form action="{{ url_for('search_tasks') }}" method="GET">
+        <div style="display: flex; gap: 0.5rem;">
+            <input 
+                type="text" 
+                name="q" 
+                class="form-control" 
+                placeholder="Search tasks by title..." 
+                value="{{ search_query if search_query else '' }}"
+                style="flex: 1;"
+            >
+            <button type="submit" class="btn btn-primary">Search</button>
+            {% if search_query %}
+            <a href="{{ url_for('tasks') }}" class="btn btn-secondary">Clear</a>
+            {% endif %}
+        </div>
+    </form>
+    {% if search_query %}
+    <p style="margin-top: 1rem; color: #6c757d; font-size: 0.9rem;">
+        Showing results for: <strong>"{{ search_query }}"</strong>
+    </p>
+    {% endif %}
+</div>
+
+<!-- Filter and Sort Controls -->
+<div class="card" style="margin-bottom: 1.5rem;">
+    <h3 style="margin-bottom: 1rem; color: #2c3e50; font-size: 1.1rem;">Filter & Sort</h3>
+    <form action="{{ url_for('tasks') }}" method="GET">
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <!-- Filter Dropdown -->
+            <div style="flex: 1; min-width: 150px;">
+                <label for="filter" class="form-label" style="font-size: 0.9rem;">Filter by Status</label>
+                <select name="filter" id="filter" class="form-control" onchange="this.form.submit()">
+                    <option value="all" {% if filter_by == 'all' %}selected{% endif %}>All Tasks</option>
+                    <option value="pending" {% if filter_by == 'pending' %}selected{% endif %}>Pending</option>
+                    <option value="completed" {% if filter_by == 'completed' %}selected{% endif %}>Completed</option>
+                </select>
+            </div>
+            
+            <!-- Sort Dropdown -->
+            <div style="flex: 1; min-width: 150px;">
+                <label for="sort" class="form-label" style="font-size: 0.9rem;">Sort by</label>
+                <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                    <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
+                    <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
+                    <option value="alphabetical" {% if sort_by == 'alphabetical' %}selected{% endif %}>Alphabetical (A-Z)</option>
+                </select>
+            </div>
+
+            <!-- Priority Filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label for="priority" class="form-label" style="font-size: 0.9rem;">Filter by Priority</label>
+                <select name="priority" id="priority" class="form-control" onchange="this.form.submit()">
+                    <option value="all" {% if priority_filter == 'all' %}selected{% endif %}>All Priorities</option>
+                    <option value="high" {% if priority_filter == 'high' %}selected{% endif %}>🔴 High</option>
+                    <option value="medium" {% if priority_filter == 'medium' %}selected{% endif %}>🟡 Medium</option>
+                    <option value="low" {% if priority_filter == 'low' %}selected{% endif %}>🟢 Low</option>
+                </select>
+            </div>
+
+            <!-- Category Filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label for="category" class="form-label" style="font-size: 0.9rem;">Filter by Category</label>
+                <select name="category" id="category" class="form-control" onchange="this.form.submit()">
+                    <option value="all" {% if category_filter == 'all' %}selected{% endif %}>All Categories</option>
+                    <option value="general" {% if category_filter == 'general' %}selected{% endif %}> General</option>
+                    <option value="work" {% if category_filter == 'work' %}selected{% endif %}> Work</option>
+                    <option value="personal" {% if category_filter == 'personal' %}selected{% endif %}> Personal</option>
+                    <option value="school" {% if category_filter == 'school' %}selected{% endif %}> School</option>
+                    <option value="health" {% if category_filter == 'health' %}selected{% endif %}> Health</option>
+                    <option value="finance" {% if category_filter == 'finance' %}selected{% endif %}> Finance</option>
+                    <option value="shopping" {% if category_filter == 'shopping' %}selected{% endif %}> Shopping</option>
+                </select>
+            </div>
+        </div>
+        
+        {% if filter_by != 'all' or sort_by != 'newest' or priority_filter != 'all' or category_filter != 'all' %}
+        <div style="margin-top: 1rem;">
+            <a href="{{ url_for('tasks') }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
+                Reset Filters
+            </a>
+        </div>
+        {% endif %}
+    </form>
+</div>
+
 <!-- Tasks List -->
 {% if tasks %}
     {% for task in tasks %}
     <div class="task-card {% if task.completed %}completed{% endif %}">
-        <div class="task-title">
-            {% if task.completed %}[Completed]{% endif %}
-            {{ task.title }}
+        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+            <div class="task-title" style="flex: 1;">
+                {% if task.completed %}[Completed]{% endif %}
+                {{ task.title }}
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <span class="task-tag" style="margin-left: 0.5rem; background: {% if task.priority == 'high' %}#dc3545{% elif task.priority == 'low' %}#28a745{% else %}#ffc107{% endif %}; color: white; font-size: 0.75rem;">
+                {% if task.priority == 'high' %}🔴 HIGH
+                {% elif task.priority == 'low' %}🟢 LOW
+                {% else %}🟡 MEDIUM{% endif %}
+                </span>
+
+                <span class="task-tag" style="margin-left: 0.5rem; background: #667eea; color: white; font-size: 0.75rem;">
+                {% if task.category == 'work' %} Work
+                {% elif task.category == 'personal' %} Personal
+                {% elif task.category == 'school' %} School
+                {% elif task.category == 'health' %} Health
+                {% elif task.category == 'finance' %} Finance
+                {% elif task.category == 'shopping' %} Shopping
+                {% else %} General{% endif %}
+                </span>
+            </div>
         </div>
         
         <div class="task-actions">

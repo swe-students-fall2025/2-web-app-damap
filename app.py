@@ -104,20 +104,79 @@ def dashboard():
 @app.route('/tasks')
 @login_required
 def tasks():
-    # Get user's tasks
-    tasks = list(db.tasks.find({'user_id': ObjectId(current_user.id)}).sort('created_at', -1))
+    # Get filter and sort parameters
+    filter_by = request.args.get('filter', 'all')  # all, completed, pending
+    priority_filter = request.args.get('priority', 'all')  # all, high, medium, low
+    category_filter = request.args.get('category', 'all')
+    sort_by = request.args.get('sort', 'newest')   # newest, oldest, alphabetical
     
-    return render_template('tasks.html', tasks=tasks)
+    # Build query based on filter
+    query = {'user_id': ObjectId(current_user.id)}
+    
+    if filter_by == 'completed':
+        query['completed'] = True
+    elif filter_by == 'pending':
+        query['completed'] = False
+    # 'all' doesn't add any filter
+
+    # Add priority filter
+    if priority_filter != 'all':
+        query['priority'] = priority_filter
+
+    # Add category filter
+    if category_filter != 'all':
+        if category_filter == 'general':
+            # Include tasks without category field OR with category='general'
+            query['$or'] = [
+                {'category': 'general'},
+                {'category': {'$exists': False}}
+            ]
+        else:
+            query['category'] = category_filter
+    
+    # Determine sort order
+    if sort_by == 'oldest':
+        sort_order = [('created_at', 1)]  # ascending
+    elif sort_by == 'alphabetical':
+        sort_order = [('title', 1)]  # A-Z
+    else:  # newest (default)
+        sort_order = [('created_at', -1)]  # descending
+    
+    # Get filtered and sorted tasks
+    tasks = list(db.tasks.find(query).sort(sort_order))
+    
+    return render_template('tasks.html', tasks=tasks, filter_by=filter_by, sort_by=sort_by, priority_filter=priority_filter, category_filter=category_filter)
+
+@app.route('/tasks/search')
+@login_required
+def search_tasks():
+    query = request.args.get('q', '')
+    
+    if query:
+        # Search for tasks that contain the query in the title (case-insensitive)
+        tasks = list(db.tasks.find({
+            'user_id': ObjectId(current_user.id),
+            'title': {'$regex': query, '$options': 'i'}
+        }).sort('created_at', -1))
+    else:
+        # If no query, return all tasks
+        tasks = list(db.tasks.find({'user_id': ObjectId(current_user.id)}).sort('created_at', -1))
+    
+    return render_template('tasks.html', tasks=tasks, search_query=query)
 
 @app.route('/tasks/new', methods=['GET', 'POST'])
 @login_required
 def new_task():
     if request.method == 'POST':
         title = request.form['title']
-        
+        priority = request.form.get('priority', 'medium')
+        category = request.form.get('category', 'general')
+
         task_data = {
             'user_id': ObjectId(current_user.id),
             'title': title,
+            'priority': priority,
+            'category': category,
             'completed': False,
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
@@ -150,10 +209,14 @@ def edit_task(task_id):
     if request.method == 'POST':
         title = request.form['title']
         completed = 'completed' in request.form
+        priority = request.form.get('priority', 'medium')
+        category = request.form.get('category', 'general')
         
         update_data = {
             'title': title,
             'completed': completed,
+            'priority': priority,
+            'category': category,
             'updated_at': datetime.utcnow()
         }
         
