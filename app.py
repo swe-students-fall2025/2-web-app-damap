@@ -212,6 +212,7 @@ def new_task():
             'tags': tags,  # Assigning tags to tasks - store tags as array
             'due_date': due_date,  # Adding due dates to tasks - store due date
             'feedback': feedback, # Store feedback
+            'needs_review': False,
             'completed': False,
             'notes': notes,  # Adding Comments/Notes - store notes
             'created_at': datetime.utcnow(),
@@ -268,6 +269,9 @@ def edit_task(task_id):
         # Adding Comments/Notes - Get notes from form
         notes = request.form.get('notes', '').strip()
 
+        # Get "Needs review" from form
+        needs_review = 'needs_review' in request.form
+
         update_data = {
             'title': title,
             'completed': completed,
@@ -277,6 +281,7 @@ def edit_task(task_id):
             'due_date': due_date,  # Adding due date to tasks - Update due date
             'feedback': feedback, # Update feedback
             'notes': notes,  # Adding Comments/Notes - Update notes
+            'needs_review': needs_review,
             'updated_at': datetime.utcnow()
         }
         

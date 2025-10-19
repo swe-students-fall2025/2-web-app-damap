@@ -73,6 +73,23 @@
             </small>
         </div>
         
+        <!-- "Needs review" checkbox -->
+        {% if task.needs_review %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="needs_review" checked>
+                <span>Needs review?</span>
+            </label>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="needs_review">
+                <span>Needs review?</span>
+            </label>
+        </div>
+        {% endif %}
+        
         {% if task.completed %}
         <div class="form-group">
             <label style="display: flex; align-items: center; gap: 0.5rem;">

@@ -16,6 +16,14 @@
         <span class="task-tag" style="background: {% if task.completed %}#28a745{% else %}#6c757d{% endif %}; color: white;">
             {% if task.completed %}Completed{% else %}Pending{% endif %}
         </span>
+
+        <!-- Display "needs review" -->
+         {% if task.needs_review %}
+         <span class="task-tag" style="background: #ff0000; color: white;">
+            Needs review
+        </span>
+        {% endif %}
+
         <span class="task-tag" style="background: 
             {% if task.priority == 'high' %}#dc3545
             {% elif task.priority == 'low' %}#28a745
