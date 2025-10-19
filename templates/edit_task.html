@@ -57,6 +57,14 @@
                 Optional: Set a deadline for this task
             </small>
         </div>
+
+        <!-- Feedback input field -->
+        <div class="form-group">
+            <label for="feedback" class="form-label">Feedback</label>
+            <input type="text" id="feedback" name="feedback" class="form-control" 
+                   value="{% if task.feedback %}{{ task.feedback }}{% endif %}" 
+                   placeholder="Enter feedback">
+        </div>
         
         {% if task.completed %}
         <div class="form-group">

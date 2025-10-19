@@ -197,6 +197,9 @@ def new_task():
             except ValueError:
                 flash('Invalid date format')
                 return render_template('new_task.html')
+        
+        # Get feedback from form
+        feedback = request.form.get('feedback', '')
 
         task_data = {
             'user_id': ObjectId(current_user.id),
@@ -205,6 +208,7 @@ def new_task():
             'category': category,
             'tags': tags,  # Assigning tags to tasks - store tags as array
             'due_date': due_date,  # Adding due dates to tasks - store due date
+            'feedback': feedback, # Store feedback
             'completed': False,
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
@@ -253,6 +257,9 @@ def edit_task(task_id):
             except ValueError:
                 flash('Invalid date format')
                 return render_template('edit_task.html', task=task)
+        
+        # Get feedback from form
+        feedback = request.form.get('feedback', '')
 
         update_data = {
             'title': title,
@@ -261,6 +268,7 @@ def edit_task(task_id):
             'category': category,
             'tags': tags, #Assigning tags to tasks - Update tags
             'due_date': due_date,  # Adding due date to tasks - Update due date
+            'feedback': feedback, # Update feedback
             'updated_at': datetime.utcnow()
         }
         
