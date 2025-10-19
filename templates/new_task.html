@@ -36,8 +36,26 @@
                 <option value="shopping"> Shopping</option>
             </select>
         </div>
+
+        <!-- NEW: Tags Input Field -->
+        <div class="form-group">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" id="tags" name="tags" class="form-control" placeholder="e.g., Important, Urgent, Review (comma-separated)">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Separate multiple tags with commas
+            </small>
+        </div>
+
+        <!-- NEW: Due Date Input Field -->
+        <div class="form-group">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="date" id="due_date" name="due_date" class="form-control">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a deadline for this task
+            </small>
+        </div>
+
         
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
 
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
             <button type="submit" class="btn btn-primary" style="flex: 1;">
