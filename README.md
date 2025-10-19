@@ -21,4 +21,4 @@ Should work through: http://localhost:5000
 
 ## Task boards
 
-See instructions. Delete this line and place a link to the task boards here.
+https://github.com/swe-students-fall2025/2-web-app-damap/projects?query=is%3Aopen
