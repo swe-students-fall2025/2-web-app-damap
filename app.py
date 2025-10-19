@@ -200,6 +200,9 @@ def new_task():
         
         # Get feedback from form
         feedback = request.form.get('feedback', '')
+            
+        # Adding Comments/Notes - Get notes from form
+        notes = request.form.get('notes', '').strip()
 
         task_data = {
             'user_id': ObjectId(current_user.id),
@@ -210,6 +213,7 @@ def new_task():
             'due_date': due_date,  # Adding due dates to tasks - store due date
             'feedback': feedback, # Store feedback
             'completed': False,
+            'notes': notes,  # Adding Comments/Notes - store notes
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
         }
@@ -260,6 +264,9 @@ def edit_task(task_id):
         
         # Get feedback from form
         feedback = request.form.get('feedback', '')
+            
+        # Adding Comments/Notes - Get notes from form
+        notes = request.form.get('notes', '').strip()
 
         update_data = {
             'title': title,
@@ -269,6 +276,7 @@ def edit_task(task_id):
             'tags': tags, #Assigning tags to tasks - Update tags
             'due_date': due_date,  # Adding due date to tasks - Update due date
             'feedback': feedback, # Update feedback
+            'notes': notes,  # Adding Comments/Notes - Update notes
             'updated_at': datetime.utcnow()
         }
         

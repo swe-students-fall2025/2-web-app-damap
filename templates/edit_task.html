@@ -37,7 +37,7 @@
             </select>
         </div>
 
-        <!-- NEW: Tags Input Field -->
+        <!-- Tags Input Field -->
         <div class="form-group">
             <label for="tags" class="form-label">Tags</label>
             <input type="text" id="tags" name="tags" class="form-control" 
@@ -48,7 +48,7 @@
             </small>
         </div>
 
-        <!-- NEW: Due Date Input Field -->
+        <!-- Due Date Input Field -->
         <div class="form-group">
             <label for="due_date" class="form-label">Due Date</label>
             <input type="date" id="due_date" name="due_date" class="form-control"
@@ -64,6 +64,13 @@
             <input type="text" id="feedback" name="feedback" class="form-control" 
                    value="{% if task.feedback %}{{ task.feedback }}{% endif %}" 
                    placeholder="Enter feedback">
+        <!-- Notes/Comments Field -->
+        <div class="form-group">
+            <label for="notes" class="form-label">Notes / Comments</label>
+            <textarea id="notes" name="notes" class="form-control" rows="5" placeholder="Add any additional details, expectations, or clarifications for this task...">{{ task.notes if task.notes else '' }}</textarea>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Use this space to clarify assignment expectations, add project details, or write reminders
+            </small>
         </div>
         
         {% if task.completed %}
