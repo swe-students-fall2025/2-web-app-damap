@@ -197,6 +197,9 @@ def new_task():
             except ValueError:
                 flash('Invalid date format')
                 return render_template('new_task.html')
+            
+        # Adding Comments/Notes - Get notes from form
+        notes = request.form.get('notes', '').strip()
 
         task_data = {
             'user_id': ObjectId(current_user.id),
@@ -206,6 +209,7 @@ def new_task():
             'tags': tags,  # Assigning tags to tasks - store tags as array
             'due_date': due_date,  # Adding due dates to tasks - store due date
             'completed': False,
+            'notes': notes,  # Adding Comments/Notes - store notes
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow()
         }
@@ -253,6 +257,9 @@ def edit_task(task_id):
             except ValueError:
                 flash('Invalid date format')
                 return render_template('edit_task.html', task=task)
+            
+        # Adding Comments/Notes - Get notes from form
+        notes = request.form.get('notes', '').strip()
 
         update_data = {
             'title': title,
@@ -261,6 +268,7 @@ def edit_task(task_id):
             'category': category,
             'tags': tags, #Assigning tags to tasks - Update tags
             'due_date': due_date,  # Adding due date to tasks - Update due date
+            'notes': notes,  # Adding Comments/Notes - Update notes
             'updated_at': datetime.utcnow()
         }
         
