@@ -81,9 +81,22 @@
                     <option value="shopping" {% if category_filter == 'shopping' %}selected{% endif %}> Shopping</option>
                 </select>
             </div>
+
+            <!-- NEW: Tag Filter -->
+            <div style="flex: 1; min-width: 150px;">
+                <label for="tag" class="form-label" style="font-size: 0.9rem;">Filter by Tag</label>
+                <select name="tag" id="tag" class="form-control" onchange="this.form.submit()">
+                    <option value="all" {% if tag_filter == 'all' %}selected{% endif %}>All Tags</option>
+                    {% if all_tags %}
+                        {% for tag in all_tags %}
+                        <option value="{{ tag }}" {% if tag_filter == tag %}selected{% endif %}>🏷️ {{ tag }}</option>
+                        {% endfor %}
+                    {% endif %}
+                </select>
+            </div>
         </div>
         
-        {% if filter_by != 'all' or sort_by != 'newest' or priority_filter != 'all' or category_filter != 'all' %}
+        {% if filter_by != 'all' or sort_by != 'newest' or priority_filter != 'all' or category_filter != 'all' or tag_filter != 'all' %}
         <div style="margin-top: 1rem;">
             <a href="{{ url_for('tasks') }}" class="btn btn-secondary" style="font-size: 0.85rem; padding: 0.5rem 1rem;">
                 Reset Filters
@@ -118,6 +131,32 @@
                 {% elif task.category == 'shopping' %} Shopping
                 {% else %} General{% endif %}
                 </span>
+
+                <!-- NEW: Display Tags -->
+                {% if task.tags and task.tags|length > 0 %}
+                    {% for tag in task.tags %}
+                    <span class="task-tag" style="background: #17a2b8; color: white; font-size: 0.75rem;">
+                        🏷️ {{ tag }}
+                    </span>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- NEW: Display Due Date -->
+                {% if task.due_date %}
+                {% set today = task.created_at.replace(hour=0, minute=0, second=0, microsecond=0) %}
+                {% set due_date_only = task.due_date.replace(hour=0, minute=0, second=0, microsecond=0) %}
+                {% set days_until = (due_date_only - today).days %}
+                <span class="task-tag" style="background: 
+                    {% if not task.completed %}
+                        {% if days_until < 0 %}#dc3545
+                        {% elif days_until == 0 %}#ffc107
+                        {% elif days_until <= 3 %}#fd7e14
+                        {% else %}#6c757d{% endif %}
+                    {% else %}#6c757d{% endif %}
+                ; color: white; font-size: 0.75rem;">
+                    📅 {{ task.due_date.strftime('%b %d') }}
+                </span>
+                {% endif %}
             </div>
         </div>
         
