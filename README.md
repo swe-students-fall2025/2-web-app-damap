@@ -8,7 +8,7 @@ Our webapp will help users manage their to-do lists and keep track of their dail
 
 ## User stories
 
-See instructions. Delete this line and place a link to the user stories here.
+https://github.com/swe-students-fall2025/2-web-app-damap/projects?query=is%3Aopen
 
 ## Steps necessary to run the software
 
