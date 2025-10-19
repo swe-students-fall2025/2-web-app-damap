@@ -14,7 +14,9 @@ https://github.com/swe-students-fall2025/2-web-app-damap/projects?query=is%3Aope
 
 1. git clone <your-repo-url>
 2. pip install -r requirements.txt
-3. python app.py
+3. Set up MongoDB
+4. Configure environment variables
+5. python app.py
 
 Should work through: http://localhost:5000
 
