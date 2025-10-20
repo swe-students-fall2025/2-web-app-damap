@@ -131,6 +131,15 @@
                 {% endif %}
             </div>
             <div style="display: flex; gap: 0.5rem;">
+                <!-- Display number of milestones done -->
+                {% if task.milestones %}
+                    {% if task.milestones_done %}
+                    <span style="color: #058e20; font-weight: bold;">{{ task.milestones_done }}/{{ task.milestones|length }} milestones done</span>
+                    {% else %}
+                    <span style="color: #058e20; font-weight: bold;">0/{{ task.milestones|length }} milestones done</span>
+                    {% endif %}
+                {% endif %}
+
                 <span class="task-tag" style="margin-left: 0.5rem; background: {% if task.priority == 'high' %}#dc3545{% elif task.priority == 'low' %}#28a745{% else %}#ffc107{% endif %}; color: white; font-size: 0.75rem;">
                 {% if task.priority == 'high' %}🔴 HIGH
                 {% elif task.priority == 'low' %}🟢 LOW

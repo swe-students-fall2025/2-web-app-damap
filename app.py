@@ -184,6 +184,10 @@ def new_task():
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
 
+        # Get milestones from form, comma-separated
+        milestones_input = request.form.get('milestones', '')
+        milestones = [milestone.strip() for milestone in milestones_input.split(',') if milestone.strip()]
+
         # Assigning tags to tasks - Get tags from form (comma-separated)
         tags_input = request.form.get('tags', '')
         tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
@@ -219,6 +223,8 @@ def new_task():
             'title': title,
             'priority': priority,
             'category': category,
+            'milestones': milestones, # Store milestones array
+            'milestones_done': 0, # Store number of milestones done
             'tags': tags,  # Assigning tags to tasks - store tags as array
             'due_date': due_date,  # Adding due dates to tasks - store due date
             'reminder': reminder, # Store reminder date
@@ -260,6 +266,12 @@ def edit_task(task_id):
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
 
+        # Get milestones from form, comma-separated
+        milestones_input = request.form.get('milestones', '')
+        milestones = [milestone.strip() for milestone in milestones_input.split(',') if milestone.strip()]
+        # Get number of milestones done from form
+        milestones_done = request.form.get('milestones_done', '')
+
         # Assigning tags to tasks - Get tags from form 
         tags_input = request.form.get('tags', '')
         tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
@@ -298,6 +310,8 @@ def edit_task(task_id):
             'completed': completed,
             'priority': priority,
             'category': category,
+            'milestones': milestones, # Update milestones array
+            'milestones_done': milestones_done, # Update number of milestones done
             'tags': tags, #Assigning tags to tasks - Update tags
             'due_date': due_date,  # Adding due date to tasks - Update due date
             'reminder': reminder, # Update reminder date
