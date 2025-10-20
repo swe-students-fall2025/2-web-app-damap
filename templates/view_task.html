@@ -10,12 +10,21 @@
     <div class="task-title" style="font-size: 1.5rem; margin-bottom: 1rem;">
         {% if task.completed %}[Completed]{% endif %}
         {{ task.title }}
+        {% if task.collaborators %}with {{task.collaborators}}{% endif %}
     </div>
     
     <div class="task-meta" style="margin-bottom: 2rem; display: flex; gap: 0.5rem;">
         <span class="task-tag" style="background: {% if task.completed %}#28a745{% else %}#6c757d{% endif %}; color: white;">
             {% if task.completed %}Completed{% else %}Pending{% endif %}
         </span>
+
+        <!-- Display "needs review" -->
+         {% if task.needs_review %}
+         <span class="task-tag" style="background: #ff0000; color: white;">
+            Needs review
+        </span>
+        {% endif %}
+
         <span class="task-tag" style="background: 
             {% if task.priority == 'high' %}#dc3545
             {% elif task.priority == 'low' %}#28a745
@@ -27,14 +36,85 @@
         <span class="task-tag" style="background: #667eea; color: white;">
             {% if task.category == 'work' %} Work{% elif task.category == 'personal' %} Personal{% elif task.category == 'school' %} School{% elif task.category == 'health' %} Health{% elif task.category == 'finance' %} Finance{% elif task.category == 'shopping' %} Shopping{% else %} General{% endif %}
         </span>
+
+        <!-- NEW: Display Tags -->
+        {% if task.tags and task.tags|length > 0 %}
+            {% for tag in task.tags %}
+            <span class="task-tag" style="background: #17a2b8; color: white;">
+                🏷️ {{ tag }}
+            </span>
+            {% endfor %}
+        {% endif %}
     </div>
     
     <div style="color: #6c757d; font-size: 0.9rem; margin-bottom: 2rem;">
+
+        <!-- Display reminder -->
+        {% if task.reminder %}
+            {% set days_since_reminder = (task.created_at - task.reminder).days %}
+            {% if not task.completed %}
+                {% if days_since_reminder > -1 %}
+                    <span style="color: #ff8307; font-weight: bold;">REMINDER: Finish this task. This reminder was </span>
+                    {% if days_since_reminder > 1 %}
+                        <span style="color: #ff8307; font-weight: bold;">{{ days_since_reminder }} days ago.</span>
+                    {% elif days_since_reminder > 0 %}
+                        <span style="color: #ff8307; font-weight: bold;">{{ days_since_reminder }} day ago.</span>
+                    {% else %}
+                        <span style="color: #ff8307; font-weight: bold;">today.</span>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endif %}
+        
         <p><strong>Created:</strong> {{ task.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
         {% if task.updated_at and task.updated_at != task.created_at %}
         <p><strong>Last Updated:</strong> {{ task.updated_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
         {% endif %}
+
+        <!-- NEW: Display Due Date -->
+        {% if task.due_date %}
+        <p><strong>Due Date:</strong> 
+            {{ task.due_date.strftime('%B %d, %Y') }}
+            {% set days_until = (task.due_date - task.created_at).days %}
+            {% if not task.completed %}
+                {% if days_until < 0 %}
+                    <span style="color: #dc3545; font-weight: bold;">⚠️ OVERDUE</span>
+                {% elif days_until == 0 %}
+                    <span style="color: #ffc107; font-weight: bold;">📅 DUE TODAY</span>
+                {% elif days_until <= 3 %}
+                    <span style="color: #ffc107; font-weight: bold;">⏰ Due soon</span>
+                {% endif %}
+            {% endif %}
+        </p>
+        {% endif %}
+
+        <!-- Display milestones -->
+         <p><strong>Milestones:</strong></p>
+        {% for milestone in task.milestones %}
+                    <div class="d-flex justify-content-between align-items-center" style="padding: 0.2rem 0; #ddd;">
+                        {% if loop.index0 < task.milestones_done|int %}
+                            <span style="color: green;">✅</span>
+                        {% else %}
+                            <span style="color: red;">❌</span>
+                        {% endif %}
+                        <span>{{ milestone }}</span>
+                    </div>
+                {% endfor %}
+
+        <!-- Display feedback -->
+         {% if task.feedback %}
+        <p><strong>Feedback:</strong></p>
+            {{ task.feedback }}
+         {% endif %}
     </div>
+
+    <!--Display Notes/Comments Section -->
+    {% if task.notes %}
+    <div style="margin-bottom: 2rem; padding: 1rem; background: #f8f9fa; border-left: 4px solid #667eea; border-radius: 4px;">
+        <h3 style="margin-bottom: 0.5rem; color: #2c3e50; font-size: 1rem; font-weight: 600;">📝 Notes</h3>
+        <p style="color: #495057; white-space: pre-wrap; margin: 0; line-height: 1.6;">{{ task.notes }}</p>
+    </div>
+    {% endif %}
     
     <div class="task-actions">
         <a href="{{ url_for('edit_task', task_id=task._id) }}" class="btn btn-primary">

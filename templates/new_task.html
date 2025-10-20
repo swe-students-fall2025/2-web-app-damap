@@ -14,6 +14,12 @@
             <label for="title" class="form-label">Task Title *</label>
             <input type="text" id="title" name="title" class="form-control" required placeholder="Enter task title">
         </div>
+
+        <!-- Collaborators input field -->
+        <div class="form-group">
+            <label for="collaborators" class="form-label">Collaborators</label>
+            <input type="text" id="collaborators" name="collaborators" class="form-control" placeholder="Optional: Enter who you're working on this task with">
+        </div>
         
         <div class="form-group">
             <label for="priority" class="form-label">Priority</label>
@@ -36,9 +42,58 @@
                 <option value="shopping"> Shopping</option>
             </select>
         </div>
-        
-        <div style="display: flex; gap: 1rem; margin-top: 2rem;">
 
+        <!-- Milestones input field -->
+        <div class="form-group">
+            <label for="milestones" class="form-label">Milestones</label>
+            <input type="text" id="milestones" name="milestones" class="form-control" placeholder="Optional: Enter milestones to track task progess">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Separate milestones with commas
+            </small>
+        </div>
+
+        <!-- Tags Input Field -->
+        <div class="form-group">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" id="tags" name="tags" class="form-control" placeholder="e.g. Important, Urgent, Collaborative">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Separate multiple tags with commas
+            </small>
+        </div>
+
+        <!-- Due Date Input Field -->
+        <div class="form-group">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="date" id="due_date" name="due_date" class="form-control">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a deadline for this task
+            </small>
+        </div>
+
+        <!-- Reminder input field -->
+        <div class="form-group">
+            <label for="reminder" class="form-label">Remind me on:</label>
+            <input type="date" id="reminder" name="reminder" class="form-control">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a reminder
+            </small>
+        </div>
+
+        <!-- Feedback input field -->
+        <div class="form-group">
+            <label for="feedback" class="form-label">Feedback</label>
+            <input type="text" id="feedback" name="feedback" class="form-control" placeholder="Enter feedback">
+        </div>
+
+        <!-- Notes/Comments Field -->
+        <div class="form-group">
+            <label for="notes" class="form-label">Notes / Comments</label>
+            <textarea id="notes" name="notes" class="form-control" rows="5" placeholder="Add any additional details, expectations, or clarifications for this task..."></textarea>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Use this space to clarify assignment expectations, add project details, or write reminders
+            </small>
+        </div>
+        
         <div style="display: flex; gap: 1rem; margin-top: 2rem;">
             <button type="submit" class="btn btn-primary" style="flex: 1;">
                 Create Task

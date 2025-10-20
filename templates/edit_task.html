@@ -15,6 +15,14 @@
             <input type="text" id="title" name="title" class="form-control" value="{{ task.title }}" required>
         </div>
 
+        <!-- Collaborators input field-->
+        <div class="form-group">
+            <label for="collaborators" class="form-label">Collaborators</label>
+            <input type="text" id="collaborators" name="collaborators" class="form-control" 
+                   value="{% if task.collaborators %}{{ task.collaborators }}{% endif %}" 
+                   placeholder="Optional: Enter who you're working on this task with">
+        </div>
+
         <div class="form-group">
             <label for="priority" class="form-label">Priority</label>
             <select id="priority" name="priority" class="form-control">
@@ -36,6 +44,101 @@
                 <option value="shopping" {% if task.category == 'shopping' %}selected{% endif %}> Shopping</option>
             </select>
         </div>
+
+        <!-- Milestones input field-->
+        <div class="form-group">
+            <label for="milestones" class="form-label">Milestones</label>
+            <input type="text" id="milestones" name="milestones" class="form-control" 
+                   value="{% if task.milestones %}{{ task.milestones|join(', ') }}{% endif %}" 
+                   placeholder="Optional: Enter milestones to track task progess">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Separate milestones with commas
+            </small>
+        </div>
+
+        {% if task.milestones %}
+            <!-- Number of milestones done input field -->
+            <div class="form-group">
+                <label for="milestones_done" class="form-label">Number of Milestones Done</label>
+                <input type="text" id="milestones_done" name="milestones_done" class="form-control" 
+                    value="{{ task.milestones_done }}" 
+                    placeholder="Enter number of milestones done">
+            <!-- Show milestones currently done -->
+                {% for milestone in task.milestones %}
+                    <div class="d-flex justify-content-between align-items-center" style="padding: 0.5rem 0; border-bottom: 1px solid #ddd;">
+                        {% if loop.index0 < task.milestones_done|int %}
+                            <span style="color: green;">✅</span>
+                        {% else %}
+                            <span style="color: red;">❌</span>
+                        {% endif %}
+                        <span>{{ milestone }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Tags Input Field -->
+        <div class="form-group">
+            <label for="tags" class="form-label">Tags</label>
+            <input type="text" id="tags" name="tags" class="form-control" 
+                   value="{% if task.tags %}{{ task.tags|join(', ') }}{% endif %}" 
+                   placeholder="e.g. Important, Urgent, Collaborative">
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Separate multiple tags with commas
+            </small>
+        </div>
+
+        <!-- Due Date Input Field -->
+        <div class="form-group">
+            <label for="due_date" class="form-label">Due Date</label>
+            <input type="date" id="due_date" name="due_date" class="form-control"
+                   {% if task.due_date %}value="{{ task.due_date.strftime('%Y-%m-%d') }}"{% endif %}>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a deadline for this task
+            </small>
+        </div>
+
+        <!-- Reminder input field -->
+        <div class="form-group">
+            <label for="reminder" class="form-label">Remind me on:</label>
+            <input type="date" id="reminder" name="reminder" class="form-control"
+                   {% if task.reminder %}value="{{ task.reminder.strftime('%Y-%m-%d') }}"{% endif %}>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a reminder
+            </small>
+        </div>
+
+        <!-- Feedback input field -->
+        <div class="form-group">
+            <label for="feedback" class="form-label">Feedback</label>
+            <input type="text" id="feedback" name="feedback" class="form-control" 
+                   value="{% if task.feedback %}{{ task.feedback }}{% endif %}" 
+                   placeholder="Enter feedback">
+        <!-- Notes/Comments Field -->
+        <div class="form-group">
+            <label for="notes" class="form-label">Notes / Comments</label>
+            <textarea id="notes" name="notes" class="form-control" rows="5" placeholder="Add any additional details, expectations, or clarifications for this task...">{{ task.notes if task.notes else '' }}</textarea>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Use this space to clarify assignment expectations, add project details, or write reminders
+            </small>
+        </div>
+        
+        <!-- "Needs review" checkbox -->
+        {% if task.needs_review %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="needs_review" checked>
+                <span>Needs review?</span>
+            </label>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="needs_review">
+                <span>Needs review?</span>
+            </label>
+        </div>
+        {% endif %}
         
         {% if task.completed %}
         <div class="form-group">

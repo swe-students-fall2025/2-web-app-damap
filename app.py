@@ -108,7 +108,8 @@ def tasks():
     filter_by = request.args.get('filter', 'all')  # all, completed, pending
     priority_filter = request.args.get('priority', 'all')  # all, high, medium, low
     category_filter = request.args.get('category', 'all')
-    sort_by = request.args.get('sort', 'newest')   # newest, oldest, alphabetical
+    tag_filter = request.args.get('tag', 'all')  # Filter tasks by tags - tag filter
+    sort_by = request.args.get('sort', 'newest')   # newest, oldest, alphabetical, due date
     
     # Build query based on filter
     query = {'user_id': ObjectId(current_user.id)}
@@ -133,6 +134,10 @@ def tasks():
             ]
         else:
             query['category'] = category_filter
+
+    # Filter tasks by tag - add tag filter
+    if tag_filter != 'all':
+        query['tags'] = tag_filter
     
     # Determine sort order
     if sort_by == 'oldest':
@@ -141,13 +146,21 @@ def tasks():
         sort_order = [('title', 1)]  # A-Z
     elif sort_by == 'newest':
         sort_order = [('created_at', -1)]          # newest first
+        #Sort tasks by due date - sort by due date (nulls last), then by created_at
+    elif sort_by == 'due_date':
+        sort_order = [('due_date', 1), ('created_at', -1)]
     else:   # Default to custom order
         sort_order = [('order', 1)]
+
     
     # Get filtered and sorted tasks
     tasks = list(db.tasks.find(query).sort(sort_order))
+
+    # Filter tasks by tag - Get all unique tags for filter dropdown
+    all_tags = db.tasks.distinct('tags', {'user_id': ObjectId(current_user.id)})
     
-    return render_template('tasks.html', tasks=tasks, filter_by=filter_by, sort_by=sort_by, priority_filter=priority_filter, category_filter=category_filter)
+    # Filter tasks by tag - Pass tag filter & all tags to template
+    return render_template('tasks.html', tasks=tasks, filter_by=filter_by, sort_by=sort_by, priority_filter=priority_filter, category_filter=category_filter, tag_filter=tag_filter, all_tags=all_tags)
 
 @app.route('/tasks/search')
 @login_required
@@ -171,6 +184,10 @@ def search_tasks():
 def new_task():
     if request.method == 'POST':
         title = request.form['title']
+
+        # Get collaborators from form
+        collaborators = request.form.get('collaborators', '')
+
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
 
@@ -179,13 +196,55 @@ def new_task():
             sort=[('order', -1)]
         )
         next_order = max_order_task['order'] + 1 if max_order_task else 1
+        # Get milestones from form, comma-separated
+        milestones_input = request.form.get('milestones', '')
+        milestones = [milestone.strip() for milestone in milestones_input.split(',') if milestone.strip()]
+
+        # Assigning tags to tasks - Get tags from form (comma-separated)
+        tags_input = request.form.get('tags', '')
+        tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+
+        #Adding due dates to tasks - Get due date from form
+        due_date_str = request.form.get('due_date', '')
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('new_task.html')
+        
+        # Get reminder date from form
+        reminder_str = request.form.get('reminder', '')
+        reminder = None
+        if reminder_str:
+            try:
+                reminder = datetime.strptime(reminder_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('new_task.html')
+        
+        # Get feedback from form
+        feedback = request.form.get('feedback', '')
+            
+        # Adding Comments/Notes - Get notes from form
+        notes = request.form.get('notes', '').strip()
 
         task_data = {
             'user_id': ObjectId(current_user.id),
             'title': title,
+            'collaborators': collaborators, # Store collaborators
             'priority': priority,
             'category': category,
+            'milestones': milestones, # Store milestones array
+            'milestones_done': 0, # Store number of milestones done
+            'tags': tags,  # Assigning tags to tasks - store tags as array
+            'due_date': due_date,  # Adding due dates to tasks - store due date
+            'reminder': reminder, # Store reminder date
+            'feedback': feedback, # Store feedback
+            'needs_review': False,
             'completed': False,
+            'notes': notes,  # Adding Comments/Notes - store notes
             'created_at': datetime.utcnow(),
             'updated_at': datetime.utcnow(),
             'order': next_order
@@ -217,15 +276,67 @@ def edit_task(task_id):
     
     if request.method == 'POST':
         title = request.form['title']
+
+        # Get collaborators from form
+        collaborators = request.form.get('collaborators', '')
+
         completed = 'completed' in request.form
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
+
+        # Get milestones from form, comma-separated
+        milestones_input = request.form.get('milestones', '')
+        milestones = [milestone.strip() for milestone in milestones_input.split(',') if milestone.strip()]
+        # Get number of milestones done from form
+        milestones_done = request.form.get('milestones_done', '')
+
+        # Assigning tags to tasks - Get tags from form 
+        tags_input = request.form.get('tags', '')
+        tags = [tag.strip() for tag in tags_input.split(',') if tag.strip()]
+
+        # Adding due date to tasks - Get due date from form
+        due_date_str = request.form.get('due_date', '')
+        due_date = None
+        if due_date_str:
+            try:
+                due_date = datetime.strptime(due_date_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('edit_task.html', task=task)
         
+        # Get reminder date from form
+        reminder_str = request.form.get('reminder', '')
+        reminder = None
+        if reminder_str:
+            try:
+                reminder = datetime.strptime(reminder_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('new_task.html')
+        
+        # Get feedback from form
+        feedback = request.form.get('feedback', '')
+            
+        # Adding Comments/Notes - Get notes from form
+        notes = request.form.get('notes', '').strip()
+
+        # Get "Needs review" from form
+        needs_review = 'needs_review' in request.form
+
         update_data = {
             'title': title,
+            'collaborators': collaborators, # Update collaborators
             'completed': completed,
             'priority': priority,
             'category': category,
+            'milestones': milestones, # Update milestones array
+            'milestones_done': milestones_done, # Update number of milestones done
+            'tags': tags, #Assigning tags to tasks - Update tags
+            'due_date': due_date,  # Adding due date to tasks - Update due date
+            'reminder': reminder, # Update reminder date
+            'feedback': feedback, # Update feedback
+            'notes': notes,  # Adding Comments/Notes - Update notes
+            'needs_review': needs_review,
             'updated_at': datetime.utcnow()
         }
         
