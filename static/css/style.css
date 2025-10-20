@@ -549,4 +549,9 @@ body.dark-mode .dark-mode-toggle:hover {
         font-size: 1.5rem;
     }
 }
+.task-card.dragging {
+  opacity: 0.5;
+  border: 2px dashed #667eea;
+}
+
 

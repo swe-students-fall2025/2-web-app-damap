@@ -50,6 +50,7 @@
             <div style="flex: 1; min-width: 150px;">
                 <label for="sort" class="form-label" style="font-size: 0.9rem;">Sort by</label>
                 <select name="sort" id="sort" class="form-control" onchange="this.form.submit()">
+                    <option value="manual" {% if sort_by == 'manual' %}selected{% endif %}>My Custom Order</option>
                     <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest First</option>
                     <option value="oldest" {% if sort_by == 'oldest' %}selected{% endif %}>Oldest First</option>
                     <option value="alphabetical" {% if sort_by == 'alphabetical' %}selected{% endif %}>Alphabetical (A-Z)</option>
@@ -108,8 +109,12 @@
 
 <!-- Tasks List -->
 {% if tasks %}
+    <div id="task-list">
     {% for task in tasks %}
-    <div class="task-card {% if task.completed %}completed{% endif %}">
+    <div class="task-card {% if task.completed %}completed{% endif %}"
+        draggable="true"
+        data-id="{{ task._id }}">
+
         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
             <div class="task-title" style="flex: 1;">
                 {% if task.completed %}[Completed]{% endif %}
@@ -205,6 +210,7 @@
         </div>
     </div>
     {% endfor %}
+    </div>
 {% else %}
     <div class="empty-state">
         <h3>No tasks found</h3>
@@ -221,4 +227,49 @@
         +
     </a>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const taskList = document.getElementById("task-list");
+    if (!taskList) return;
+
+    let dragging = null;
+
+    taskList.addEventListener("dragstart", e => {
+        dragging = e.target.closest(".task-card");
+        dragging.classList.add("dragging");
+    });
+
+    taskList.addEventListener("dragover", e => {
+        e.preventDefault();
+        const after = getAfterElement(taskList, e.clientY);
+        if (after == null) taskList.appendChild(dragging);
+        else taskList.insertBefore(dragging, after);
+    });
+
+    taskList.addEventListener("drop", () => {
+        const order = [...taskList.querySelectorAll(".task-card")]
+            .map(el => el.dataset.id);
+        fetch("/tasks/reorder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ order })
+        });
+        dragging.classList.remove("dragging");
+    });
+
+    function getAfterElement(container, y) {
+        const els = [...container.querySelectorAll(".task-card:not(.dragging)")];
+        return els.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset, element: child };
+            }
+            return closest;
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+});
+</script>
+
 {% endblock %}

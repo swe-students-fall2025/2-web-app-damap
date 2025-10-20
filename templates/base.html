@@ -1,107 +1,107 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Task Manager{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>TM</text></svg>">
-</head>
-<body>
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            <div class="flash-messages">
-                {% for message in messages %}
-                    <div class="flash-message">{{ message }}</div>
-                {% endfor %}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}Task Manager{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+        <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>TM</text></svg>">
+    </head>
+    <body>
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Header -->
+        <header class="header">
+            <h1>{% block header_title %}Task Manager{% endblock %}</h1>
+            <p>{% block header_subtitle %}Organize your life, one task at a time{% endblock %}</p>
+        </header>
+
+        <!-- Navigation -->
+        {% if current_user.is_authenticated %}
+        <nav class="nav">
+            <div style="display: flex; align-items: center;">
+                <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
+                <a href="{{ url_for('tasks') }}" class="{% if request.endpoint == 'tasks' %}active{% endif %}">All Tasks</a>
+                <a href="{{ url_for('new_task') }}" class="{% if request.endpoint == 'new_task' %}active{% endif %}">New Task</a>
+                <a href="{{ url_for('logout') }}">Logout</a>
             </div>
+            <button class="dark-mode-toggle" onclick="toggleDarkMode()">
+                <span id="dark-mode-text">Dark Mode</span>
+            </button>
+        </nav>
         {% endif %}
-    {% endwith %}
 
-    <!-- Header -->
-    <header class="header">
-        <h1>{% block header_title %}Task Manager{% endblock %}</h1>
-        <p>{% block header_subtitle %}Organize your life, one task at a time{% endblock %}</p>
-    </header>
+        <!-- Main Content -->
+        <main class="container">
+            {% block content %}{% endblock %}
+        </main>
 
-    <!-- Navigation -->
-    {% if current_user.is_authenticated %}
-    <nav class="nav">
-        <div style="display: flex; align-items: center;">
-            <a href="{{ url_for('dashboard') }}" class="{% if request.endpoint == 'dashboard' %}active{% endif %}">Dashboard</a>
-            <a href="{{ url_for('tasks') }}" class="{% if request.endpoint == 'tasks' %}active{% endif %}">All Tasks</a>
-            <a href="{{ url_for('new_task') }}" class="{% if request.endpoint == 'new_task' %}active{% endif %}">New Task</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </div>
-        <button class="dark-mode-toggle" onclick="toggleDarkMode()">
-            <span id="dark-mode-text">Dark Mode</span>
-        </button>
-    </nav>
-    {% endif %}
+        <!-- Footer -->
+        <footer style="text-align: center; padding: 2rem; color: #6c757d; margin-top: 2rem;">
+            <p>SWE Class Project. Team DAMAP.</p>
+        </footer>
 
-    <!-- Main Content -->
-    <main class="container">
-        {% block content %}{% endblock %}
-    </main>
+        <script>
+            // Auto-hide flash messages
+            setTimeout(function() {
+                const flashMessages = document.querySelectorAll('.flash-message');
+                flashMessages.forEach(function(message) {
+                    message.style.opacity = '0';
+                    message.style.transform = 'translateX(100%)';
+                    setTimeout(function() {
+                        message.remove();
+                    }, 300);
+                });
+            }, 3000);
 
-    <!-- Footer -->
-    <footer style="text-align: center; padding: 2rem; color: #6c757d; margin-top: 2rem;">
-        <p>SWE Class Project. Team DAMAP.</p>
-    </footer>
+            // Toggle task completion
+            function toggleTask(taskId) {
+                fetch(`/tasks/${taskId}/toggle`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(() => {
+                    location.reload();
+                });
+            }
 
-    <script>
-        // Auto-hide flash messages
-        setTimeout(function() {
-            const flashMessages = document.querySelectorAll('.flash-message');
-            flashMessages.forEach(function(message) {
-                message.style.opacity = '0';
-                message.style.transform = 'translateX(100%)';
-                setTimeout(function() {
-                    message.remove();
-                }, 300);
-            });
-        }, 3000);
-
-        // Toggle task completion
-        function toggleTask(taskId) {
-            fetch(`/tasks/${taskId}/toggle`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+            // Dark mode functionality
+            function toggleDarkMode() {
+                const body = document.body;
+                const darkModeText = document.getElementById('dark-mode-text');
+                
+                if (body.classList.contains('dark-mode')) {
+                    body.classList.remove('dark-mode');
+                    darkModeText.textContent = 'Dark Mode';
+                    localStorage.setItem('darkMode', 'false');
+                } else {
+                    body.classList.add('dark-mode');
+                    darkModeText.textContent = 'Light Mode';
+                    localStorage.setItem('darkMode', 'true');
                 }
-            }).then(() => {
-                location.reload();
+            }
+
+            // Load dark mode preference on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                const darkMode = localStorage.getItem('darkMode');
+                const body = document.body;
+                const darkModeText = document.getElementById('dark-mode-text');
+                
+                if (darkMode === 'true') {
+                    body.classList.add('dark-mode');
+                    darkModeText.textContent = 'Light Mode';
+                }
             });
-        }
-
-        // Dark mode functionality
-        function toggleDarkMode() {
-            const body = document.body;
-            const darkModeText = document.getElementById('dark-mode-text');
-            
-            if (body.classList.contains('dark-mode')) {
-                body.classList.remove('dark-mode');
-                darkModeText.textContent = 'Dark Mode';
-                localStorage.setItem('darkMode', 'false');
-            } else {
-                body.classList.add('dark-mode');
-                darkModeText.textContent = 'Light Mode';
-                localStorage.setItem('darkMode', 'true');
-            }
-        }
-
-        // Load dark mode preference on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const darkMode = localStorage.getItem('darkMode');
-            const body = document.body;
-            const darkModeText = document.getElementById('dark-mode-text');
-            
-            if (darkMode === 'true') {
-                body.classList.add('dark-mode');
-                darkModeText.textContent = 'Light Mode';
-            }
-        });
-    </script>
-</body>
-</html>
+        </script>
+    </body>
+    </html>

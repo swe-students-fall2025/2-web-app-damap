@@ -144,11 +144,14 @@ def tasks():
         sort_order = [('created_at', 1)]  # ascending
     elif sort_by == 'alphabetical':
         sort_order = [('title', 1)]  # A-Z
-    #Sort tasks by due date - sort by due date (nulls last), then by created_at
+    elif sort_by == 'newest':
+        sort_order = [('created_at', -1)]          # newest first
+        #Sort tasks by due date - sort by due date (nulls last), then by created_at
     elif sort_by == 'due_date':
         sort_order = [('due_date', 1), ('created_at', -1)]
-    else:  # newest (default)
-        sort_order = [('created_at', -1)]  # descending
+    else:   # Default to custom order
+        sort_order = [('order', 1)]
+
     
     # Get filtered and sorted tasks
     tasks = list(db.tasks.find(query).sort(sort_order))
@@ -188,6 +191,11 @@ def new_task():
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
 
+        max_order_task = db.tasks.find_one(
+            {'user_id': ObjectId(current_user.id)},
+            sort=[('order', -1)]
+        )
+        next_order = max_order_task['order'] + 1 if max_order_task else 1
         # Get milestones from form, comma-separated
         milestones_input = request.form.get('milestones', '')
         milestones = [milestone.strip() for milestone in milestones_input.split(',') if milestone.strip()]
@@ -238,7 +246,8 @@ def new_task():
             'completed': False,
             'notes': notes,  # Adding Comments/Notes - store notes
             'created_at': datetime.utcnow(),
-            'updated_at': datetime.utcnow()
+            'updated_at': datetime.utcnow(),
+            'order': next_order
         }
         
         db.tasks.insert_one(task_data)
@@ -360,6 +369,22 @@ def toggle_task(task_id):
         )
     
     return redirect(url_for('tasks'))
+
+@app.route('/tasks/reorder', methods=['POST'])
+@login_required
+def reorder_tasks():
+    data = request.get_json()
+    new_order = data.get('order', [])  # list of task IDs in new order
+
+    # Update each task's order field
+    for index, task_id in enumerate(new_order, start=1):
+        db.tasks.update_one(
+            {'_id': ObjectId(task_id), 'user_id': ObjectId(current_user.id)},
+            {'$set': {'order': index}}
+        )
+
+    return jsonify({'status': 'success'})
+
 
 if __name__ == '__main__':
     app.run(debug=True)
