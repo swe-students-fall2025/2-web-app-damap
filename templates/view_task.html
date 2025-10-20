@@ -10,6 +10,7 @@
     <div class="task-title" style="font-size: 1.5rem; margin-bottom: 1rem;">
         {% if task.completed %}[Completed]{% endif %}
         {{ task.title }}
+        {% if task.collaborators %}with {{task.collaborators}}{% endif %}
     </div>
     
     <div class="task-meta" style="margin-bottom: 2rem; display: flex; gap: 0.5rem;">
@@ -86,6 +87,19 @@
             {% endif %}
         </p>
         {% endif %}
+
+        <!-- Display milestones -->
+         <p><strong>Milestones:</strong></p>
+        {% for milestone in task.milestones %}
+                    <div class="d-flex justify-content-between align-items-center" style="padding: 0.2rem 0; #ddd;">
+                        {% if loop.index0 < task.milestones_done|int %}
+                            <span style="color: green;">✅</span>
+                        {% else %}
+                            <span style="color: red;">❌</span>
+                        {% endif %}
+                        <span>{{ milestone }}</span>
+                    </div>
+                {% endfor %}
 
         <!-- Display feedback -->
          {% if task.feedback %}
