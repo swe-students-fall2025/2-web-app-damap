@@ -20,6 +20,10 @@ https://github.com/swe-students-fall2025/2-web-app-damap/projects?query=is%3Aope
 
 Should work through: http://localhost:5000
 
+Troubleshooting:
+1. Kill localhost process: lsof -ti:5000
+2. Kill python app: pkill -f "python.*app.py"
+
 
 ## Task boards
 
