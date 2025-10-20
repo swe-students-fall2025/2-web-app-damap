@@ -58,6 +58,16 @@
             </small>
         </div>
 
+        <!-- Reminder input field -->
+        <div class="form-group">
+            <label for="reminder" class="form-label">Remind me on:</label>
+            <input type="date" id="reminder" name="reminder" class="form-control"
+                   {% if task.reminder %}value="{{ task.reminder.strftime('%Y-%m-%d') }}"{% endif %}>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a reminder
+            </small>
+        </div>
+
         <!-- Feedback input field -->
         <div class="form-group">
             <label for="feedback" class="form-label">Feedback</label>
