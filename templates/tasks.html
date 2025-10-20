@@ -114,6 +114,7 @@
             <div class="task-title" style="flex: 1;">
                 {% if task.completed %}[Completed]{% endif %}
                 {{ task.title }}
+                {% if task.collaborators %}with {{task.collaborators}}{% endif %}
                 {% if task.reminder %}
                     {% set days_since_reminder = (task.created_at - task.reminder).days %}
                     {% if not task.completed %}

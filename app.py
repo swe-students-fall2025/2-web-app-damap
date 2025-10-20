@@ -181,6 +181,10 @@ def search_tasks():
 def new_task():
     if request.method == 'POST':
         title = request.form['title']
+
+        # Get collaborators from form
+        collaborators = request.form.get('collaborators', '')
+
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
 
@@ -221,6 +225,7 @@ def new_task():
         task_data = {
             'user_id': ObjectId(current_user.id),
             'title': title,
+            'collaborators': collaborators, # Store collaborators
             'priority': priority,
             'category': category,
             'milestones': milestones, # Store milestones array
@@ -262,6 +267,10 @@ def edit_task(task_id):
     
     if request.method == 'POST':
         title = request.form['title']
+
+        # Get collaborators from form
+        collaborators = request.form.get('collaborators', '')
+
         completed = 'completed' in request.form
         priority = request.form.get('priority', 'medium')
         category = request.form.get('category', 'general')
@@ -307,6 +316,7 @@ def edit_task(task_id):
 
         update_data = {
             'title': title,
+            'collaborators': collaborators, # Update collaborators
             'completed': completed,
             'priority': priority,
             'category': category,
