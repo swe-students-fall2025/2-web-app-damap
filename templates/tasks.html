@@ -114,6 +114,21 @@
             <div class="task-title" style="flex: 1;">
                 {% if task.completed %}[Completed]{% endif %}
                 {{ task.title }}
+                {% if task.reminder %}
+                    {% set days_since_reminder = (task.created_at - task.reminder).days %}
+                    {% if not task.completed %}
+                        {% if days_since_reminder > -1 %}
+                            <span style="color: #ff8307; font-weight: bold;">REMINDER: Finish this task. This reminder was </span>
+                            {% if days_since_reminder > 1 %}
+                                <span style="color: #ff8307; font-weight: bold;">{{ days_since_reminder }} days ago.</span>
+                            {% elif days_since_reminder > 0 %}
+                                <span style="color: #ff8307; font-weight: bold;">{{ days_since_reminder }} day ago.</span>
+                            {% else %}
+                                <span style="color: #ff8307; font-weight: bold;">today.</span>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
             </div>
             <div style="display: flex; gap: 0.5rem;">
                 <span class="task-tag" style="margin-left: 0.5rem; background: {% if task.priority == 'high' %}#dc3545{% elif task.priority == 'low' %}#28a745{% else %}#ffc107{% endif %}; color: white; font-size: 0.75rem;">

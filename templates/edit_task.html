@@ -58,6 +58,16 @@
             </small>
         </div>
 
+        <!-- Reminder input field -->
+        <div class="form-group">
+            <label for="reminder" class="form-label">Remind me on:</label>
+            <input type="date" id="reminder" name="reminder" class="form-control"
+                   {% if task.reminder %}value="{{ task.reminder.strftime('%Y-%m-%d') }}"{% endif %}>
+            <small style="color: #666; font-size: 0.85rem; margin-top: 0.25rem; display: block;">
+                Optional: Set a reminder
+            </small>
+        </div>
+
         <!-- Feedback input field -->
         <div class="form-group">
             <label for="feedback" class="form-label">Feedback</label>
@@ -72,6 +82,23 @@
                 Use this space to clarify assignment expectations, add project details, or write reminders
             </small>
         </div>
+        
+        <!-- "Needs review" checkbox -->
+        {% if task.needs_review %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="needs_review" checked>
+                <span>Needs review?</span>
+            </label>
+        </div>
+        {% else %}
+        <div class="form-group">
+            <label style="display: flex; align-items: center; gap: 0.5rem;">
+                <input type="checkbox" name="needs_review">
+                <span>Needs review?</span>
+            </label>
+        </div>
+        {% endif %}
         
         {% if task.completed %}
         <div class="form-group">

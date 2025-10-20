@@ -198,6 +198,16 @@ def new_task():
                 flash('Invalid date format')
                 return render_template('new_task.html')
         
+        # Get reminder date from form
+        reminder_str = request.form.get('reminder', '')
+        reminder = None
+        if reminder_str:
+            try:
+                reminder = datetime.strptime(reminder_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('new_task.html')
+        
         # Get feedback from form
         feedback = request.form.get('feedback', '')
             
@@ -211,7 +221,9 @@ def new_task():
             'category': category,
             'tags': tags,  # Assigning tags to tasks - store tags as array
             'due_date': due_date,  # Adding due dates to tasks - store due date
+            'reminder': reminder, # Store reminder date
             'feedback': feedback, # Store feedback
+            'needs_review': False,
             'completed': False,
             'notes': notes,  # Adding Comments/Notes - store notes
             'created_at': datetime.utcnow(),
@@ -262,11 +274,24 @@ def edit_task(task_id):
                 flash('Invalid date format')
                 return render_template('edit_task.html', task=task)
         
+        # Get reminder date from form
+        reminder_str = request.form.get('reminder', '')
+        reminder = None
+        if reminder_str:
+            try:
+                reminder = datetime.strptime(reminder_str, '%Y-%m-%d')
+            except ValueError:
+                flash('Invalid date format')
+                return render_template('new_task.html')
+        
         # Get feedback from form
         feedback = request.form.get('feedback', '')
             
         # Adding Comments/Notes - Get notes from form
         notes = request.form.get('notes', '').strip()
+
+        # Get "Needs review" from form
+        needs_review = 'needs_review' in request.form
 
         update_data = {
             'title': title,
@@ -275,8 +300,10 @@ def edit_task(task_id):
             'category': category,
             'tags': tags, #Assigning tags to tasks - Update tags
             'due_date': due_date,  # Adding due date to tasks - Update due date
+            'reminder': reminder, # Update reminder date
             'feedback': feedback, # Update feedback
             'notes': notes,  # Adding Comments/Notes - Update notes
+            'needs_review': needs_review,
             'updated_at': datetime.utcnow()
         }
         
